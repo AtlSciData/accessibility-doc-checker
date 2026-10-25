@@ -9,11 +9,10 @@
 - [ ] git --version
 - [ ] python --version        (3.11 or newer)
 - [ ] java -version           (17 or newer)
-- [ ] mvn -v
-- [ ] gauge --version         (then: gauge install java)
+- [ ] mvn -v                (Maven will download Cucumber, JUnit and Selenium later; nothing to install now)
 - [ ] docker --version
 - [ ] aws --version
-- [ ] A code editor with a Gauge/Java plugin (IntelliJ or VS Code)
+- [ ] A code editor with Java and Cucumber support (IntelliJ IDEA Community has a Cucumber for Java plugin; VS Code has the Cucumber (Gherkin) Full Support extension)
 
 ## Repo
 - [ ] Copy this starter kit into the repo, commit, push
