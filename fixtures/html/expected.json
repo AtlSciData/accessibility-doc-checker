@@ -1,9 +1,10 @@
 {
-  "_note": "PROVISIONAL: expected axe rule IDs written from knowledge of axe-core, not yet verified by a run. On Day 2, run axe on each fixture and correct this file. 'must_include' = rules that should fire; 'must_not_include' = rules that must NOT fire.",
+  "_note": "Checked against a real axe-core 4.10.2 run on 2026-10-25. 'must_include' = rules that should fire; 'must_not_include' = rules that must NOT fire. Note: axe accepts a placeholder as an accessible name, so unlabeled inputs that have a placeholder are NOT flagged (see 02).",
   "01-missing-lang-title.html":   { "must_include": ["html-has-lang", "document-title"], "must_not_include": ["label", "image-alt"] },
-  "02-form-no-labels.html":       { "must_include": ["label"], "must_not_include": ["html-has-lang", "document-title", "image-alt"] },
+  "02-form-no-labels.html":       { "must_include": ["select-name"], "must_not_include": ["html-has-lang", "document-title", "image-alt"] },
   "03-images-no-alt.html":        { "must_include": ["image-alt"], "must_not_include": ["label", "html-has-lang"] },
   "04-low-contrast.html":         { "must_include": ["color-contrast"], "must_not_include": ["image-alt", "label"] },
   "05-heading-table-link.html":   { "must_include": ["heading-order", "link-name", "button-name"], "must_not_include": ["html-has-lang", "image-alt"] },
-  "06-accessible-baseline.html":  { "must_include": [], "must_not_include": ["html-has-lang", "document-title", "label", "image-alt", "color-contrast", "link-name", "button-name"] }
+  "06-accessible-baseline.html":  { "must_include": [], "must_not_include": ["html-has-lang", "document-title", "label", "image-alt", "color-contrast", "link-name", "button-name"] },
+  "07-input-no-label.html":       { "must_include": ["label"], "must_not_include": ["select-name", "html-has-lang", "document-title"] }
 }

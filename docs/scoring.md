@@ -28,3 +28,7 @@ should hurt the score, but should not hide every other problem.
 - The same input must always produce the same score (unit-test this).
 - Report the score together with the list of issues and the "needs human
   review" items, never the score alone.
+
+## v1.0 (frozen)
+Only violations carrying a WCAG tag are scored. Best-practice-only rules (for example landmark-one-main, region, heading-order) are listed as advice and do not change the score. Weights and caps: critical 10 (cap 3), serious 7 (cap 3), moderate 3 (cap 5), minor 1 (cap 5).
+
