@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Java / Maven / Gauge
+target/
+reports/
+logs/
+.gauge/
+# Node
+node_modules/
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+# Secrets and AWS - never commit
+.env
+*.pem
+.aws/
+# Uploaded / generated working files
+uploads/
+output/
