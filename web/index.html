@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility Document Checker</title>
+<style>
+  body { font-family: system-ui, sans-serif; color: #1a1a1a; background: #ffffff; margin: 0; line-height: 1.5; }
+  main { max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  h1 { font-size: 1.75rem; margin-top: 0; }
+  h2 { font-size: 1.25rem; margin-top: 2rem; }
+  label { display: block; font-weight: 600; margin-bottom: 0.4rem; }
+  input[type=file] { margin-bottom: 1rem; }
+  button { background: #0b4f8a; color: #ffffff; border: 0; padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 4px; cursor: pointer; }
+  button:disabled { background: #555555; cursor: not-allowed; }
+  :focus-visible { outline: 3px solid #b45f00; outline-offset: 2px; }
+  .score { font-size: 3rem; font-weight: 700; margin: 0.5rem 0; }
+  .note { color: #444444; }
+  .error { color: #9b1c1c; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+  caption { text-align: left; font-weight: 600; padding-bottom: 0.4rem; }
+  th, td { border: 1px solid #767676; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: #eef2f6; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Accessibility Document Checker</h1>
+  <p class="note">Upload an HTML file to scan it against WCAG using axe-core. Automated checks find only part of the problems, so a human review is still needed.</p>
+
+  <form id="upload-form">
+    <label for="file">HTML file (.html or .htm, up to 2 MB)</label>
+    <input type="file" id="file" name="file" accept=".html,.htm">
+    <div><button type="submit" id="scan-btn">Scan file</button></div>
+  </form>
+
+  <div id="results" aria-live="polite"></div>
+</main>
+
+<script>
+const form = document.getElementById("upload-form");
+const fileInput = document.getElementById("file");
+const button = document.getElementById("scan-btn");
+const results = document.getElementById("results");
+
+function el(tag, text, attrs) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (attrs) Object.keys(attrs).forEach(k => node.setAttribute(k, attrs[k]));
+  return node;
+}
+
+function issueTable(title, rows) {
+  const table = el("table");
+  table.appendChild(el("caption", title));
+  const head = el("tr");
+  ["Rule", "Impact", "Instances", "How to fix"].forEach(h => head.appendChild(el("th", h, { scope: "col" })));
+  const thead = el("thead"); thead.appendChild(head); table.appendChild(thead);
+  const tbody = el("tbody");
+  rows.forEach(v => {
+    const tr = el("tr");
+    tr.appendChild(el("th", v.id, { scope: "row" }));
+    tr.appendChild(el("td", v.impact || "n/a"));
+    tr.appendChild(el("td", String(v.nodes)));
+    const td = el("td");
+    const a = el("a", v.help, { href: v.help_url, target: "_blank", rel: "noopener" });
+    td.appendChild(a);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+function render(data) {
+  results.replaceChildren();
+  results.appendChild(el("h2", "Results for " + data.filename));
+  results.appendChild(el("p", "Accessibility score: " + data.score + " out of 100", { class: "score" }));
+  if (data.violations.length === 0) {
+    results.appendChild(el("p", "No automated WCAG violations were found. This does not prove the file is fully accessible."));
+  } else {
+    results.appendChild(issueTable("Issues counted in the score", data.violations));
+  }
+  if (data.advice.length > 0) {
+    results.appendChild(issueTable("Advice (best practice, not scored)", data.advice));
+  }
+  if (data.incomplete.length > 0) {
+    results.appendChild(el("p", "Needs human review: " + data.incomplete.join(", "), { class: "note" }));
+  }
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  results.replaceChildren();
+  if (!fileInput.files.length) {
+    results.appendChild(el("p", "Please choose an HTML file first.", { class: "error" }));
+    return;
+  }
+  button.disabled = true;
+  results.appendChild(el("p", "Scanning..."));
+  const body = new FormData();
+  body.append("file", fileInput.files[0]);
+  try {
+    const response = await fetch("/api/scan", { method: "POST", body });
+    const data = await response.json();
+    if (!response.ok) {
+      results.replaceChildren(el("p", data.error || "Scan failed.", { class: "error" }));
+    } else {
+      render(data);
+    }
+  } catch (err) {
+    results.replaceChildren(el("p", "Could not reach the server.", { class: "error" }));
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
